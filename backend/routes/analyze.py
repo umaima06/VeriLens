@@ -16,7 +16,7 @@ def analyze_text(data: AnalyzeRequest):
     bias_score = min(len(biased_phrases) * 15, 100)
     credibility_score = max(100 - bias_score, 0)
 
-    explanation = generate_bias_explanation(
+    ai_output = generate_bias_explanation(
         text=data.text,
         sentiment=sentiment,
         bias_score=bias_score,
@@ -24,9 +24,13 @@ def analyze_text(data: AnalyzeRequest):
     )
 
     return {
-        "sentiment": sentiment,
-        "bias_score": bias_score,
-        "credibility_score": credibility_score,
-        "biased_phrases": biased_phrases,
-        "ai_explanation": explanation
-    }
+    "article_text": data.text,
+    "sentiment": sentiment,
+    "bias_score": bias_score,
+    "credibility_score": credibility_score,
+    "biased_phrases": biased_phrases,
+    "ai_reasoning": ai_output["reasoning"],
+    "neutral_rewrite": ai_output["neutral_rewrite"],
+    "counter_perspective": ai_output["counter_perspective"]
+}
+

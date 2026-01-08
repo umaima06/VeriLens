@@ -1,9 +1,9 @@
-export default function AnalysisCards() {
+export default function AnalysisCards({ sentiment, bias, credibility }) {
   return (
     <div className="grid grid-cols-3 gap-4">
-      <Card title="Sentiment" value="+87" desc="Positive / Optimistic" color="text-blue-600" />
-      <Card title="Bias Level" value="87" desc="High bias detected" color="text-red-600" />
-      <Card title="Credibility" value="83" desc="High credibility" color="text-green-600" />
+      <Card title="Sentiment" value={sentiment?.compound ?? 0} desc="Overall tone" />
+      <Card title="Bias Level" value={bias} desc="Detected bias" />
+      <Card title="Credibility" value={credibility ?? 100 - bias} desc="Estimated trust" />
     </div>
   );
 }

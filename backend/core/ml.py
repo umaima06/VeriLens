@@ -12,6 +12,26 @@ def analyze_sentiment(text: str) -> dict:
         "compound": scores["compound"]
     }
 
+def calculate_bias_score(sentiment: dict, biased_phrases: list) -> int:
+    score = 0
+
+    # Phrase-based bias
+    for p in biased_phrases:
+        if p["type"] == "emotional":
+            score += 20
+        elif p["type"] == "assertion":
+            score += 15
+        elif p["type"] == "uncertainty":
+            score += 10
+
+    # Sentiment amplification (emotional tone increases bias likelihood)
+    compound = sentiment.get("compound", 0)
+    if abs(compound) > 0.5:
+        score += 15
+    elif abs(compound) > 0.2:
+        score += 8
+
+    return min(score, 100)
 
 def detect_biased_phrases(text: str) -> list:
     patterns = [
