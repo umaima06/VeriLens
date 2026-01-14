@@ -1,5 +1,14 @@
+vaderSentiment
 fastapi
 uvicorn
-vaderSentiment
+python-dotenv
+transformers
+torch
 sentence-transformers
+scikit-learn
 numpy
+requests
+newspaper3k
+lxml
+lxml_html_clean
+openai

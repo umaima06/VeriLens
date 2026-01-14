@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 frontend/src/assets
 backend/.env
+.venv
+__pycache__/
+*.pyc
