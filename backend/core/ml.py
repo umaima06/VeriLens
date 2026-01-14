@@ -34,33 +34,42 @@ def chunk_text(text: str, chunk_size: int = CHUNK_SIZE):
 def analyze_sentiment(text: str) -> dict:
     chunks = chunk_text(text)
 
-    pos, neg = 0.0, 0.0
+    pos_votes = 0
+    neg_votes = 0
+    confidences = []
 
     for chunk in chunks:
         result = _sentiment_analyzer(chunk)[0]
-        label = result["label"].upper()
+        label = result["label"]
         score = result["score"]
 
-        if label == "POSITIVE":
-            pos += score
-        else:
-            neg += score
+        confidences.append(score)
 
-    if pos > neg:
-        return {
-            "label": "POSITIVE",
-            "confidence": round(pos / len(chunks), 4)
-        }
-    elif neg > pos:
-        return {
-            "label": "NEGATIVE",
-            "confidence": round(neg / len(chunks), 4)
-        }
+        if label == "POSITIVE":
+            pos_votes += 1
+        else:
+            neg_votes += 1
+
+    total = pos_votes + neg_votes
+    
+    # Majority vote
+    if pos_votes > neg_votes:
+        label = "POSITIVE"
+    elif neg_votes > pos_votes:
+        label = "NEGATIVE"
     else:
-        return {
-            "label": "NEUTRAL",
-            "confidence": 0.5
-        }
+        label = "NEUTRAL"
+        
+    # 🔥 Dominance check (THIS IS THE KEY)
+    dominance = abs(pos_votes - neg_votes) / total
+    
+    if dominance < 0.15:
+        label = "NEUTRAL"
+
+    return {
+        "label": label,
+        "confidence": round(sum(confidences) / len(confidences), 4)
+    }
 
 # ==============================
 # BIAS SCORE (EXPORT THIS)

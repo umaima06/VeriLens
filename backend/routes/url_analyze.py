@@ -5,7 +5,7 @@ from core.scraper import extract_article_text
 from core.ml import get_bias_score
 from core.ai import generate_bias_explanation
 
-router = APIRouter(prefix="/api")
+router = APIRouter()
 
 class URLAnalyzeRequest(BaseModel):
     url: str
