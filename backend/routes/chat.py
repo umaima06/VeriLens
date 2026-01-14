@@ -1,7 +1,6 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 from core.ai import generate_chat_response
-from core.ml import analyze_sentiment, detect_biased_phrases
 from core.memory import get_history, add_turn
 import uuid
 
@@ -16,9 +15,10 @@ class ChatRequest(BaseModel):
 @router.post("/chat")
 def chat_with_article(data: ChatRequest):
     # 1️⃣ Run analysis automatically
-    sentiment = analyze_sentiment(data.article_text)
-    biased_phrases = detect_biased_phrases(data.article_text)
-    bias_score = min(len(biased_phrases) * 15, 100)
+    sentiment = {}
+    biased_phrases = []
+    bias_score = 0
+
 
     # 2️⃣ Fetch conversation memory
     session_id = data.session_id or str(uuid.uuid4())
@@ -35,7 +35,7 @@ def chat_with_article(data: ChatRequest):
     )
 
     # 4️⃣ Save memory
-    add_turn(data.session_id, data.user_question, answer)
+    add_turn(session_id, data.user_question, answer)
 
     return {
         "answer": answer,

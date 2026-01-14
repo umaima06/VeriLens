@@ -1,3 +1,5 @@
 fastapi
 uvicorn
 vaderSentiment
+sentence-transformers
+numpy

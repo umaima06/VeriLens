@@ -21,12 +21,12 @@ def generate_bias_explanation(
         client = get_client()
         phrases = [p.get("phrase") for p in biased_phrases if "phrase" in p]
         
-        if bias_score < 10 and not biased_phrases:
-            return {
-                "reasoning": "The article uses largely neutral language with minimal emotional or biased framing.",
-                "counter_perspective": "Alternative interpretations are limited because the article presents factual information without strong opinion.",
-                "neutral_rewrite": "The article already uses neutral language."
-            }
+        # if bias_score < 10 and not biased_phrases:
+        #     return {
+        #         "reasoning": "The article uses largely neutral language with minimal emotional or biased framing.",
+        #         "counter_perspective": "Alternative interpretations are limited because the article presents factual information without strong opinion.",
+        #         "neutral_rewrite": "The article already uses neutral language."
+        #     }
 
         prompt = f"""
 You are a neutral media literacy expert.
@@ -53,8 +53,12 @@ Provide the response in EXACTLY this structure:
 - might interpret the same issue differently.
 - Do NOT argue — just explain.
 
-4. Neutral Rewrite (Short)
-- write 2–3 sentences of the article in a more neutral,factual, and unbiased manner.
+4. "neutral_rewrite":
+"Rewrite the article in a neutral, factual manner.
+Preserve all factual claims.
+Remove emotional language, judgment, and persuasion.
+Do NOT summarize.
+Target length: 75–85% of the original article."
 
 5. Reader Caution Summary
 - Bullet points of what readers should be cautious about.
@@ -63,13 +67,6 @@ Rules:
 - Be neutral, factual, and non-political.
 - Do not invent facts.
 - Do not take sides.
-
-Rules for Neutral Rewrite:
-- Maintain original meaning and factual claims
-- Remove emotional adjectives and speculation
-- Do NOT summarize
-- Do NOT shorten aggressively
-- Match approximately 70–85% of the original length
 
 Rules:
 - Neutral and factual
