@@ -1,9 +1,10 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
 vaderSentiment
 fastapi
 uvicorn
 python-dotenv
 transformers
-torch
+torch==2.1.2+cpu
 sentence-transformers
 scikit-learn
 numpy
