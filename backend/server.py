@@ -5,6 +5,9 @@ from dotenv import load_dotenv
 from routes.chat import router as chat_router
 from routes.smart_chat import router as smart_chat_router
 from routes.url_analyze import router as url_analyze_router
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+import os
 
 load_dotenv()
 
@@ -25,3 +28,11 @@ app.include_router(analyze_router, prefix="/api")
 @app.get("/")
 def health_check():
     return {"status": "Backend running"}
+
+frontend_dist = os.path.join(os.path.dirname(__file__), "..", "frontend", "dist")
+
+app.mount("/assets", StaticFiles(directory=os.path.join(frontend_dist, "assets")), name="assets")
+
+@app.get("/")
+def serve_frontend():
+    return FileResponse(os.path.join(frontend_dist, "index.html"))
