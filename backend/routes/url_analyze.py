@@ -1,8 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-
 from core.scraper import extract_article_text
-from core.ml import get_bias_score
 from core.ai import generate_bias_explanation
 
 router = APIRouter()
@@ -34,8 +32,8 @@ def analyze_url(data: URLAnalyzeRequest):
     
     # Use embedding-based bias computation
     neutral = ai_output["neutral_rewrite"]
-    bias_score = get_bias_score(article_text)
-    credibility_score = max(100 - bias_score, 0)
+    bias_score = 0
+    credibility_score = 100
 
     return {
         "article_text": article_text,

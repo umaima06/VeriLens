@@ -65,13 +65,47 @@ const AnalysisPage = () => {
           <div className="grid lg:grid-cols-12 gap-6 h-[calc(100vh-140px)]">
             {/* LEFT */}
             <div className="lg:col-span-7 overflow-y-auto pr-2">
-              <SentimentBreakdown
-                sentiment={analysis?.sentiment || "Unknown"}
-                biasScore={analysis?.bias_score ?? 0}
-              />    
+              <div className="bg-white p-6 rounded-xl shadow-sm mb-6">
+  <h3 className="text-xl font-bold mb-3">Article Focus</h3>
+  <p>
+    This article primarily discusses <strong>{analysis?.signals?.topic}</strong>.
+  </p>
+  <p className="text-sm text-gray-500 mt-1">
+    Framed through a {analysis?.signals?.narrative_frame} perspective.
+  </p>
+</div>
+
+<div className="bg-white p-6 rounded-xl shadow-sm mb-6">
+  <h3 className="text-xl font-bold mb-3">Perspective & Balance</h3>
+
+  <p>
+    Detected perspective: <strong>{analysis?.signals?.ideology}</strong>
+  </p>
+
+  <div className="mt-3">
+    <p className="text-sm text-gray-500">Balance Score</p>
+    <div className="w-full bg-gray-200 rounded-full h-2 mt-1">
+      <div
+        className="bg-blue-600 h-2 rounded-full"
+        style={{ width: `${analysis?.coverage_analysis?.completeness_score}%` }}
+      />
+    </div>
+  </div>
+</div>
+
+<div className="bg-white p-6 rounded-xl shadow-sm mb-6">
+  <h3 className="text-xl font-bold mb-3">What Might Be Missing?</h3>
+
+  <ul className="list-disc ml-6 text-gray-700">
+    {analysis?.coverage_analysis?.coverage_gaps?.map((gap, i) => (
+      <li key={i}>{gap}</li>
+    ))}
+  </ul>
+</div>
+    
               <AIAnalysis
-              reasoning={analysis?.ai_reasoning || "No explanation available."}
-              rewrite={analysis?.neutral_rewrite || "No rewrite available."}
+              reasoning={analysis?.ai_layer?.reasoning || "No explanation available."}
+              rewrite={analysis?.ai_layer?.neutral_rewrite || "No rewrite available."}
               />
 
             </div>

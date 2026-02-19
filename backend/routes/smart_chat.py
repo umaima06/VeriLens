@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
 import uuid
-
+from core.ml import predict_feature1, predict_feature2
 from core.ai import generate_chat_response
 from core.memory import get_history, add_turn
 
@@ -19,9 +19,10 @@ def smart_chat(data: SmartChatRequest):
     session_id = data.session_id or str(uuid.uuid4())
 
     # 2️⃣ NO rule-based ML anymore
-    sentiment = {}
     biased_phrases = []
-    bias_score = 0
+    f1 = predict_feature1(data.article_text)
+    f2 = predict_feature2(data.article_text)
+
 
     # 3️⃣ Load memory
     history = get_history(session_id)
@@ -30,8 +31,8 @@ def smart_chat(data: SmartChatRequest):
     answer = generate_chat_response(
         article_text=data.article_text,
         user_question=data.user_question,
-        sentiment=sentiment,
-        bias_score=bias_score,
+        sentiment={},
+        bias_score=f2["completeness_score"],
         biased_phrases=biased_phrases,
         history=history
     )
@@ -42,5 +43,5 @@ def smart_chat(data: SmartChatRequest):
     return {
         "session_id": session_id,
         "answer": answer,
-        "bias_score": bias_score
+        "bias_score": f2["completeness_score"]
     }

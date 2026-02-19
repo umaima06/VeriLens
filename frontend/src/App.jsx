@@ -8,25 +8,37 @@ import AnalysisPage from "./pages/AnalysisPage";
 
 // Home Page Component (Internal)
 const Home = () => (
-  <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+  <div className="min-h-screen bg-gradient-to-br from-black via-zinc-950 to-zinc-900 text-white flex flex-col">
+
     <Header />
-    <main className="flex-grow container mx-auto px-6 flex flex-col lg:flex-row items-center justify-between gap-12 py-10">
-      <HeroSection />
-      <SubmitArticleCard />
+
+    <main className="flex-grow flex flex-col items-center justify-center px-6 text-center">
+
+      <div className="max-w-3xl space-y-8">
+
+        <span className="text-xs tracking-[0.3em] uppercase text-green-400">
+          Truth Engine
+        </span>
+
+        <h1 className="text-5xl md:text-6xl font-semibold leading-tight">
+          Decode Media.
+          <br />
+          <span className="text-green-400">Reveal Perspective.</span>
+        </h1>
+
+        <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+          VeriLens analyzes news using machine learning and AI reasoning
+          to uncover bias, emotional framing, and narrative gaps —
+          so you can read intelligently.
+        </p>
+
+        <div className="pt-6">
+          <SubmitArticleCard />
+        </div>
+
+      </div>
+
     </main>
-    <LayersSection />
+
   </div>
 );
-
-function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/results" element={<AnalysisPage />} />
-      </Routes>
-    </Router>
-  );
-}
-
-export default App;

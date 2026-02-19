@@ -1,32 +1,15 @@
-from openai import OpenAI
+from google import genai
 import os
 import json
 
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-def get_client():
-    api_key = os.getenv("OPENAI_API_KEY")
-    if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is not set")
-
-    return OpenAI(api_key=api_key)
+MODEL_NAME = "models/gemini-2.5-flash"
 
 
-def generate_bias_explanation(
-    text: str,
-    sentiment: dict,
-    bias_score: int,
-    biased_phrases: list
-):
+def generate_bias_explanation(text, sentiment, bias_score, biased_phrases):
     try:
-        client = get_client()
         phrases = [p.get("phrase") for p in biased_phrases if "phrase" in p]
-        
-        # if bias_score < 10 and not biased_phrases:
-        #     return {
-        #         "reasoning": "The article uses largely neutral language with minimal emotional or biased framing.",
-        #         "counter_perspective": "Alternative interpretations are limited because the article presents factual information without strong opinion.",
-        #         "neutral_rewrite": "The article already uses neutral language."
-        #     }
 
         prompt = f"""
 You are a neutral media literacy expert.
@@ -39,42 +22,11 @@ Analyze the article and return STRICT JSON in this format:
   "neutral_rewrite": "Rewrite 70%-80% of the article to be neutral and factual."
 }}
 
-Provide the response in EXACTLY this structure:
-
-1. Bias & Emotional Framing
-- Explain whether the article shows bias or emotional manipulation.
-- Refer explicitly to biased phrases if relevant.
-
-2. Language & Credibility Impact
-- Explain how word choice, tone, or framing may affect trustworthiness.
-
-3. Counter-Perspective
-- Briefly describe how an opposing or alternative viewpoint
-- might interpret the same issue differently.
-- Do NOT argue — just explain.
-
-4. "neutral_rewrite":
-"Rewrite the article in a neutral, factual manner.
-Preserve all factual claims.
-Remove emotional language, judgment, and persuasion.
-Do NOT summarize.
-Target length: 75–85% of the original article."
-
-5. Reader Caution Summary
-- Bullet points of what readers should be cautious about.
-
 Rules:
-- Be neutral, factual, and non-political.
-- Do not invent facts.
-- Do not take sides.
-
-Rules:
-- Neutral and factual
-- No opinions
+- Output valid JSON only
 - No markdown
 - No headings
 - No extra text
-- Do not include anything outside JSON
 
 Article:
 {text}
@@ -84,16 +36,16 @@ Bias Score: {bias_score}/100
 Biased Phrases: {phrases}
 """
 
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[{"role": "user", "content": prompt}],
-            temperature=0.3,
-            response_format={"type": "json_object"}
-            )
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt
+        )
 
-        content = response.choices[0].message.content
-        data = json.loads(content)
-        
+        raw = response.text.strip()
+        print("RAW GEMINI OUTPUT:\n", raw)
+
+        data = json.loads(raw)
+
         return {
             "reasoning": data.get("bias_reasoning", ""),
             "counter_perspective": data.get("counter_perspective", ""),
@@ -101,61 +53,45 @@ Biased Phrases: {phrases}
         }
 
     except Exception as e:
-        return f"AI explanation unavailable: {str(e)}"
+        return {
+            "reasoning": "",
+            "counter_perspective": "",
+            "neutral_rewrite": "",
+            "error": str(e)
+        }
 
 
-def generate_chat_response(
-    article_text: str,
-    user_question: str,
-    sentiment: dict,
-    bias_score: int,
-    biased_phrases: list,
-    history: list
-):
-
+def generate_chat_response(article_text, user_question, sentiment, bias_score, biased_phrases, history):
     try:
-        client = get_client()
-        # 1️⃣ BUILD MESSAGES (SYSTEM + MEMORY)
-        messages = [
-            {
-                "role": "system",
-                "content": (
-                    "You are a neutral media literacy assistant. "
-                    "Explain bias, credibility, and manipulation without political alignment."
-                )
-            }
-        ]
-
-        # 2️⃣ INJECT MEMORY (FOLLOW-UP QUESTIONS)
+        history_text = ""
         for turn in history:
-            messages.append({"role": "user", "content": turn["user"]})
-            messages.append({"role": "assistant", "content": turn["assistant"]})
+            history_text += f"User: {turn['user']}\nAssistant: {turn['assistant']}\n"
 
-        # 3️⃣ CURRENT QUESTION WITH CONTEXT
-        messages.append({
-            "role": "user",
-            "content": f"""
+        prompt = f"""
+You are VeriLens Chat — an interactive fact-checking assistant.
+
+Rules:
+- Answer ONLY using the article
+- 3–6 sentences max
+- Be neutral
+- If evidence is missing, say so clearly
+
+Conversation history:
+{history_text}
+
 Article:
 {article_text}
 
-Sentiment: {sentiment}
-Bias Score: {bias_score}/100
-Biased Phrases: {[p.get("phrase") for p in biased_phrases]}
-
-Question:
+User question:
 {user_question}
 """
-        })
 
-        # 4️⃣ CALL OPENAI (THIS REPLACES THE OLD PROMPT CALL)
-        response = client.chat.completions.create( 
-            model="gpt-4o-mini", 
-            messages=messages, 
-            temperature=0.4 
+        response = client.models.generate_content(
+            model=MODEL_NAME,
+            contents=prompt
         )
-        
-        return response.choices[0].message.content.strip()
+
+        return response.text.strip()
 
     except Exception as e:
         return f"AI chat unavailable: {str(e)}"
-    

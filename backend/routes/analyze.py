@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 from pydantic import BaseModel
-from core.ml import get_sentiment, get_bias_score
-from core.ai import generate_bias_explanation  # Layer 2
+from core.ml import predict_feature1, predict_feature2
+from core.ai import generate_bias_explanation
 
 router = APIRouter()
 
@@ -10,25 +10,35 @@ class AnalyzeRequest(BaseModel):
 
 @router.post("/analyze")
 def analyze_text(data: AnalyzeRequest):
-    # Layer 1: ML analysis
-    sentiment = get_sentiment(data.text)
-    bias_score = get_bias_score(data.text)
-    credibility_score = max(100 - bias_score, 0)
 
-    # Layer 2: AI explanation
+    # Layer 1 — ML
+    f1 = predict_feature1(data.text)
+    f2 = predict_feature2(data.text)
+
+    # Layer 2 — AI (human explanation)
     ai_output = generate_bias_explanation(
         text=data.text,
-        sentiment=sentiment,
-        bias_score=bias_score,
+        sentiment={},
+        bias_score=f2["completeness_score"],
         biased_phrases=[]
     )
 
     return {
         "article_text": data.text,
-        "sentiment": sentiment,
-        "bias_score": bias_score,
-        "credibility_score": credibility_score,
-        "ai_reasoning": ai_output["reasoning"],
-        "neutral_rewrite": ai_output["neutral_rewrite"],
-        "counter_perspective": ai_output["counter_perspective"]
+
+        "signals": {
+            "topic": f1["topic"],
+            "topic_confidence": f1["topic_confidence"],
+            "narrative_frame": f1["narrative_frame"],
+            "ideology": f2["ideology"],
+            "ideology_confidence": f2["ideology_confidence"]
+        },
+
+        "coverage_analysis": {
+            "stakeholders": f2["stakeholders"],
+            "completeness_score": f2["completeness_score"],
+            "coverage_gaps": f2["coverage_gaps"]
+        },
+
+        "ai_layer": ai_output
     }

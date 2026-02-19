@@ -2,6 +2,7 @@ from fastapi import APIRouter
 from pydantic import BaseModel
 from core.ai import generate_chat_response
 from core.memory import get_history, add_turn
+from core.ml import predict_feature1, predict_feature2
 import uuid
 
 router = APIRouter()
@@ -15,10 +16,9 @@ class ChatRequest(BaseModel):
 @router.post("/chat")
 def chat_with_article(data: ChatRequest):
     # 1️⃣ Run analysis automatically
-    sentiment = {}
     biased_phrases = []
-    bias_score = 0
-
+    f1 = predict_feature1(data.article_text)
+    f2 = predict_feature2(data.article_text)
 
     # 2️⃣ Fetch conversation memory
     session_id = data.session_id or str(uuid.uuid4())
@@ -28,8 +28,8 @@ def chat_with_article(data: ChatRequest):
     answer = generate_chat_response(
         article_text=data.article_text,
         user_question=data.user_question,
-        sentiment=sentiment,
-        bias_score=bias_score,
+        sentiment={},
+        bias_score=f2["completeness_score"],
         biased_phrases=biased_phrases,
         history=history
     )
@@ -39,5 +39,5 @@ def chat_with_article(data: ChatRequest):
 
     return {
         "answer": answer,
-        "bias_score": bias_score
+        "bias_score": f2["completeness_score"]
     }
