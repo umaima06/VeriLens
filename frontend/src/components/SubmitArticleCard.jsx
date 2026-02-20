@@ -10,62 +10,81 @@ const SubmitArticleCard = () => {
   const navigate = useNavigate();
 
   const handleAnalyze = () => {
-    if (inputValue.trim()) {
-      navigate('/results', { state: { content: inputValue, type: activeTab } });
-    }
+    if (!inputValue.trim()) return;
+    
+    navigate("/analysis", {
+      state: {
+        content: inputValue,
+        type: activeTab
+      }
+    });
   };
 
   return (
-    <div className="bg-white p-8 rounded-xl shadow-2xl shadow-gray-200/50 border border-gray-100 w-full max-w-xl">
-      <h2 className="text-3xl font-serif text-gray-900 mb-6">Submit Article</h2>
-      
-      {/* Custom Tabs */}
-      <div className="flex bg-gray-50 p-1 rounded-lg mb-6 border border-gray-100">
-        <button 
-          onClick={() => setActiveTab('text')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-medium transition-all ${activeTab === 'text' ? 'bg-white shadow-sm text-gray-900 border border-gray-100' : 'text-gray-500 hover:text-gray-700'}`}
+  <div className="relative bg-zinc-900/40 backdrop-blur-xl border border-emerald-500/20 p-10 rounded-3xl shadow-lg shadow-emerald-500/5 w-full max-w-xl">
+
+    <div className="absolute -top-20 -right-20 w-40 h-40 bg-emerald-500/20 blur-3xl rounded-full"></div>
+
+    <div className="relative z-10">
+
+      <h2 className="text-3xl font-bold mb-8">
+        Analyze an Article
+      </h2>
+
+      {/* Tabs */}
+      <div className="flex bg-zinc-800/60 p-1 rounded-xl mb-8">
+        <button
+          onClick={() => setActiveTab("text")}
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+            activeTab === "text"
+              ? "bg-emerald-500 text-black"
+              : "text-zinc-400 hover:text-white"
+          }`}
         >
-          <FileText size={16} /> Paste Text
+          Paste Text
         </button>
-        <button 
-          onClick={() => setActiveTab('url')}
-          className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md text-sm font-medium transition-all ${activeTab === 'url' ? 'bg-white shadow-sm text-gray-900 border border-gray-100' : 'text-gray-500 hover:text-gray-700'}`}
+
+        <button
+          onClick={() => setActiveTab("url")}
+          className={`flex-1 py-2 rounded-lg text-sm font-medium transition ${
+            activeTab === "url"
+              ? "bg-emerald-500 text-black"
+              : "text-zinc-400 hover:text-white"
+          }`}
         >
-          <LinkIcon size={16} /> URL
+          URL
         </button>
       </div>
 
-      {/* Input Area */}
-      <div className="mb-6">
-        {activeTab === 'text' ? (
-          <textarea 
-            className="w-full h-48 p-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-900/10 focus:border-green-900 transition-all resize-none text-gray-700 placeholder-gray-400 font-sans text-base leading-relaxed"
-            placeholder="Paste your article text here..."
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-          />
-        ) : (
-          <div className="space-y-3">
-            <input 
-              type="url" 
-              className="w-full p-4 bg-white border border-gray-200 rounded-lg focus:ring-2 focus:ring-green-900/10 focus:border-green-900 transition-all text-gray-700 placeholder-gray-400 font-sans"
-              placeholder="https://example.com/article"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-            />
-            <div className="flex items-center gap-2 text-xs text-gray-500 bg-gray-50 p-3 rounded border border-gray-100">
-              <AlertCircle size={14} className="text-gray-400"/>
-              <span>We'll extract and analyze the article content automatically</span>
-            </div>
-          </div>
-        )}
-      </div>
+      {/* Input */}
+      {activeTab === "text" ? (
+        <textarea
+          className="w-full h-52 p-5 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"
+          placeholder="Paste your article text here..."
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+        />
+      ) : (
+        <input
+          type="url"
+          className="w-full p-4 bg-zinc-950 border border-zinc-800 rounded-xl text-zinc-200 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          placeholder="https://example.com/article"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+        />
+      )}
 
-      <Button onClick={handleAnalyze} disabled={!inputValue.trim()}>
-        Analyze Article
-      </Button>
+      {/* CTA */}
+      <button
+        onClick={handleAnalyze}
+        disabled={!inputValue.trim()}
+        className="w-full mt-8 py-4 rounded-xl font-semibold transition bg-emerald-500 text-black hover:bg-emerald-400 disabled:opacity-40"
+      >
+        Analyze Article →
+      </button>
+
     </div>
-  );
-};
+  </div>
+);};
 
 export default SubmitArticleCard;

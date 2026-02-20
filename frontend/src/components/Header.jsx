@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 const Header = () => {
   return (
-    <header className="w-full py-6">
+    <header className="w-full py-6 bg-transparent">
       <div className="container mx-auto px-6 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2 group">
            {/* Logo Mark */}
@@ -11,8 +11,8 @@ const Header = () => {
           </div> */}
           {/* Logo Text */}
           <div className="flex flex-col">
-            <span className="font-sans font-bold text-gray-1800 tracking-wide text-sm leading-none">VeriLens</span>
-            <span className="text-[10px] font-bold tracking-[0.2em] text-gray-400 uppercase leading-none mb-0.5">News & Article Analyzer</span>
+            <span className="font-semibold text-white tracking-wide text-lg">VeriLens</span>
+            <span className="text-[10px] tracking-[0.3em] text-zinc-500 uppercase">Analyst Engine</span>
           </div>
         </Link>
 

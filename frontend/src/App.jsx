@@ -20,13 +20,13 @@ const Home = () => (
           Truth Engine
         </span>
 
-        <h1 className="text-5xl md:text-6xl font-semibold leading-tight">
+        <h1 className="text-6xl md:text-7xl font-bold leading-tight tracking-tight">
           Decode Media.
           <br />
-          <span className="text-green-400">Reveal Perspective.</span>
+          <span className="text-green-400 drop-shadow-[0_0_20px_rgba(34,197,94,0.4)]">Reveal Perspective.</span>
         </h1>
 
-        <p className="text-zinc-400 text-lg max-w-2xl mx-auto">
+        <p >
           VeriLens analyzes news using machine learning and AI reasoning
           to uncover bias, emotional framing, and narrative gaps —
           so you can read intelligently.
@@ -42,3 +42,15 @@ const Home = () => (
 
   </div>
 );
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/analysis" element={<AnalysisPage />} />
+      </Routes>
+    </Router>
+  );
+}
+
+export default App;
