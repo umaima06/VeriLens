@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from core.scraper import extract_article_text
 from core.ai import generate_bias_explanation
+from routes.analyze import predict_feature1, predict_feature2
 
 router = APIRouter()
 
@@ -18,29 +19,25 @@ def analyze_url(data: URLAnalyzeRequest):
             detail="Unable to fetch article. This website may block automated access."
         )
 
-    # ✅ Replace sentiment & biased_phrases with empty placeholders
-    sentiment = {}
-    biased_phrases = []
-
-    # Compute bias score using embeddings only
+    signals = predict_feature1(article_text)
+    coverage = predict_feature2(article_text)
+    
     ai_output = generate_bias_explanation(
         text=article_text,
-        sentiment=sentiment,
-        bias_score=0,  # temporary, will recalc below
-        biased_phrases=biased_phrases
-    )
-    
-    # Use embedding-based bias computation
-    neutral = ai_output["neutral_rewrite"]
-    bias_score = 0
-    credibility_score = 100
+        sentiment={},
+        bias_score=coverage["completeness_score"],  
+        biased_phrases=[]
+   )
 
     return {
-        "article_text": article_text,
-        "bias_score": bias_score,
-        "credibility_score": credibility_score,
-        "biased_phrases": biased_phrases,
-        "ai_reasoning": ai_output["reasoning"],
-        "neutral_rewrite": neutral,
-        "counter_perspective": ai_output["counter_perspective"]
+       "article_text": article_text,
+       "signals": {
+           "topic": signals["topic"],
+           "topic_confidence": signals["topic_confidence"],
+           "narrative_frame": signals["narrative_frame"],
+           "ideology": coverage["ideology"],
+           "ideology_confidence": coverage["ideology_confidence"]
+        },
+       "coverage_analysis": coverage,
+       "ai_layer": ai_output
     }

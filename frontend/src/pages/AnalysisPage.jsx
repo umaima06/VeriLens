@@ -91,7 +91,7 @@ const AnalysisPage = () => {
 
         <div>
           <p className="text-xs uppercase tracking-widest text-emerald-400 mb-3">
-            Balance Score
+            Article Coverage
           </p>
 
           <div className="relative h-3 bg-zinc-800 rounded-full overflow-hidden">
